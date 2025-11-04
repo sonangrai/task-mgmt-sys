@@ -12,5 +12,5 @@ const PORT = process.env.PORT || 4000;
 app.use("/api/", router);
 
 app.listen(PORT, () => {
-  console.log("app running", PORT);
+  console.log("app running on PORT -> ", PORT);
 });
