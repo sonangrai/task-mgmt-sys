@@ -6,13 +6,13 @@
  */
 class ResponseObj {
   status: number;
-  data: object | null;
+  data: object | any[] | null;
   meta: object | null;
   msg: string;
 
   constructor(
     status: number,
-    data: object | null,
+    data: object | any[] | null,
     meta: object | null,
     msg: string
   ) {
