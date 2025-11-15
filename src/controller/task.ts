@@ -1,8 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { NewTask, task } from "../db/schema";
 import ResponseObj from "./response";
+import { validate as isValidUUID } from "uuid";
 import { eq } from "drizzle-orm";
+import { AppError } from "../middleware/db-error";
 
 export const getTask = async (req: Request, res: Response) => {
   try {
@@ -45,5 +47,36 @@ export const createTask = async (req: Request, res: Response) => {
     return res.send(resObj);
   } catch (error) {
     return res.send(error);
+  }
+};
+
+export const deleteTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!isValidUUID(req.params.id)) {
+      throw new AppError(400, "Invalid task ID format. Expected valid UUID.");
+    }
+
+    const result = await db
+      .delete(task)
+      .where(eq(task.id, req.params.id))
+      .returning();
+
+    if (result.length == 0)
+      throw new ResponseObj(404, {}, null, "Failed to delete");
+
+    const resObj = new ResponseObj(
+      200,
+      null,
+      null,
+      "Task deleted successfully"
+    );
+
+    return res.status(200).send(resObj);
+  } catch (error: any) {
+    next(error);
   }
 };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createTask, getTask } from "../controller/task";
+import { createTask, deleteTask, getTask } from "../controller/task";
 import { authenticateToken } from "../middleware/auth";
 import { check } from "express-validator";
 import checkValidation from "../middleware/validator";
@@ -20,5 +20,8 @@ router.post(
   authenticateToken,
   createTask
 );
+
+// Delete a task
+router.delete("/:id", authenticateToken, deleteTask);
 
 export default router;
