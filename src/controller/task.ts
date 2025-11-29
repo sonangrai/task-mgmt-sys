@@ -50,6 +50,43 @@ export const createTask = async (req: Request, res: Response) => {
   }
 };
 
+export const editTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const payload: NewTask = {
+    title: req.body.title,
+    description: req.body.description || "",
+    due: new Date(req.body.due),
+    userId: req?.user?.id as string,
+    status: req.body.status || undefined,
+    priority: req.body.priority || undefined,
+  };
+
+  try {
+    if (!isValidUUID(req.params.id)) {
+      throw new AppError(400, "Invalid task ID format. Expected valid UUID.");
+    }
+
+    const response = await db
+      .update(task)
+      .set(payload)
+      .where(eq(task.id, req.params.id))
+      .returning();
+
+    const resObj = new ResponseObj(
+      200,
+      response,
+      null,
+      "Task updated successfully"
+    );
+    return res.send(resObj);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteTask = async (
   req: Request,
   res: Response,
