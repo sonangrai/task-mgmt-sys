@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
-    "build": "npx tsc"
+    "start": "node dist/src/index.js ",
+    "dev:backend": "nodemon src/index.ts",
+    "dev:frontend": "cd frontend && pnpm dev",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "build": "npx tsc && cd frontend && npm run build",
+    "install-deps": "pnpm install && cd frontend && pnpm install"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +18,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.6",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
