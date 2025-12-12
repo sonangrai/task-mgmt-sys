@@ -15,6 +15,9 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
+import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { loginAPI, verifyAPI } from '@/api/auth'
 
 const formSchema = z.object({
   email: z.string().email('Add a valid email'),
@@ -25,13 +28,22 @@ const otpFormSchema = z.object({
 })
 
 function AuthPage() {
+  const [otpState, setOtpState] = useState<boolean>(false)
+  const [email, setEmail] = useState<string>('')
+
+  const updateOTPState = (a: boolean) => setOtpState(a)
+  const updateEmailState = (a: string) => setEmail(a)
+
   return (
     <div className="flex h-dvh w-full items-center justify-center">
       <Card className="w-[400px] mx-auto">
         <CardHeader>Login to TMS</CardHeader>
         <CardContent>
-          <LoginForm />
-          <OTPForm />
+          {otpState ? (
+            <OTPForm email={email} />
+          ) : (
+            <LoginForm setOtp={updateOTPState} setMail={updateEmailState} />
+          )}
         </CardContent>
       </Card>
     </div>
@@ -40,7 +52,13 @@ function AuthPage() {
 
 export default AuthPage
 
-const LoginForm = () => {
+const LoginForm = ({
+  setOtp,
+  setMail,
+}: {
+  setOtp: (a: boolean) => void
+  setMail: (a: string) => void
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,8 +66,19 @@ const LoginForm = () => {
     },
   })
 
+  const loginMutation = useMutation({
+    mutationFn: loginAPI,
+    mutationKey: ['login'],
+  })
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data)
+    loginMutation.mutate(data.email, {
+      onSuccess: () => {
+        setMail(data.email)
+        setOtp(true)
+      },
+      onError: () => console.log('vayena'),
+    })
   }
 
   return (
@@ -71,14 +100,18 @@ const LoginForm = () => {
         />
       </FieldGroup>
 
-      <Button type="submit" className="w-fit">
-        Login
+      <Button
+        type="submit"
+        className="w-fit"
+        disabled={loginMutation.isPending}
+      >
+        {loginMutation.isPending ? 'Logging...' : 'Login'}
       </Button>
     </form>
   )
 }
 
-const OTPForm = () => {
+const OTPForm = ({ email }: { email: string }) => {
   const form = useForm<z.infer<typeof otpFormSchema>>({
     resolver: zodResolver(otpFormSchema),
     defaultValues: {
@@ -86,8 +119,22 @@ const OTPForm = () => {
     },
   })
 
+  const verifyMutation = useMutation({
+    mutationFn: verifyAPI,
+    mutationKey: ['verify otp'],
+  })
+
   const onSubmit = (data: z.infer<typeof otpFormSchema>) => {
-    console.log(data)
+    verifyMutation.mutate(
+      {
+        email: email,
+        otp: data.otp,
+      },
+      {
+        onSuccess: () => console.log('vayo'),
+        onError: () => console.log('vayena'),
+      },
+    )
   }
 
   return (
@@ -118,8 +165,12 @@ const OTPForm = () => {
         />
       </FieldGroup>
 
-      <Button type="submit" className="w-fit">
-        Verify
+      <Button
+        type="submit"
+        className="w-fit"
+        disabled={verifyMutation.isPending}
+      >
+        {verifyMutation.isPending ? 'Verifying...' : 'Verify'}
       </Button>
     </form>
   )
