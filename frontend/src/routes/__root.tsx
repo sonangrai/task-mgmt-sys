@@ -7,6 +7,13 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
+  auth:
+    | {
+        user: any | null
+        isAuthenticated: boolean
+        isLoading: boolean
+      }
+    | undefined
   queryClient: QueryClient
 }
 

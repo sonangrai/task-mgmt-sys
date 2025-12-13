@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { createClient } from '@supabase/supabase-js'
+import { AuthError, createClient, type Session } from '@supabase/supabase-js'
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -41,4 +41,40 @@ export const verifyAPI = async ({
   } catch (error) {
     return error
   }
+}
+
+export const logoutAPI = async () => {
+  try {
+    const res = await supabase.auth.signOut()
+
+    if (res.error) throw res
+    return res
+  } catch (error) {
+    return error
+  }
+}
+
+type SessionRes =
+  | {
+      data: {
+        session: Session
+      }
+      error: null
+    }
+  | {
+      data: {
+        session: null
+      }
+      error: AuthError
+    }
+  | {
+      data: {
+        session: null
+      }
+      error: null
+    }
+
+export const getUserAPI = async (): Promise<SessionRes> => {
+  const res = await supabase.auth.getSession()
+  return res
 }
