@@ -1,11 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import logo from '../logo.svg'
+import { useAuth } from '@/provider/auth-provider'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
+  const context = useAuth()
+
   return (
     <div className="text-center">
       <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
@@ -23,7 +26,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          Learn React with {context.user?.email}
         </a>
         <a
           className="text-[#61dafb] hover:underline"
@@ -33,6 +36,7 @@ function App() {
         >
           Learn TanStack
         </a>
+        {}
       </header>
     </div>
   )
