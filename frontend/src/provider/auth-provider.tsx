@@ -1,54 +1,50 @@
 import { getUserAPI } from '@/api/auth'
 import { useQuery } from '@tanstack/react-query'
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 
 interface User {
   id: string
-  email: string
+  email: string | undefined
 }
 
 type AuthContextType = {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
+  error: Error | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-
   const {
     data: userData,
     isPending,
     isFetched,
+    error,
   } = useQuery({
     queryKey: ['user'],
     queryFn: getUserAPI,
   })
 
-  useEffect(() => {
-    if (!isPending && isFetched)
-      setUser({
-        id: userData?.data.session?.user.id as string,
-        email: userData?.data.session?.user.email as string,
-      })
-  }, [userData, isFetched, isPending])
+  // Derive user directly from query data
+  const user =
+    isFetched && userData?.data?.session?.user
+      ? {
+          id: userData.data.session.user.id,
+          email: userData.data.session.user.email,
+        }
+      : null
+
+  const value: AuthContextType = {
+    user,
+    isAuthenticated: !!user,
+    isLoading: isPending,
+    error: error as Error | null,
+  }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading: isPending,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {isPending ? <>Loading...</> : <>{children}</>}
     </AuthContext.Provider>
   )
