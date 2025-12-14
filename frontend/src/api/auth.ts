@@ -1,13 +1,9 @@
-import axios from 'axios'
-import { AuthError, createClient, type Session } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
-)
+import { AuthError, type Session } from '@supabase/supabase-js'
+import axiosInstance, { ENDPOINT, supabase } from './config'
 
 export const getProfileAPI = async () => {
-  const res = await axios.post(`${ENDPOINT}/user`)
+  console.log(ENDPOINT)
+  const res = await axiosInstance.get(`${ENDPOINT}/user`)
   return res
 }
 
