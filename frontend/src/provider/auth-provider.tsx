@@ -9,6 +9,7 @@ interface User {
 
 type AuthContextType = {
   user: User | null
+  token: string | null
   isAuthenticated: boolean
   isLoading: boolean
   error: Error | null
@@ -27,6 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: getUserAPI,
   })
 
+  console.log(userData)
+
   // Derive user directly from query data
   const user =
     isFetched && userData?.data?.session?.user
@@ -38,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextType = {
     user,
+    token: userData?.data.session?.access_token as string,
     isAuthenticated: !!user,
     isLoading: isPending,
     error: error as Error | null,
