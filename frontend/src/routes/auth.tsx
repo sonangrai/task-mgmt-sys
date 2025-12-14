@@ -7,7 +7,7 @@ export const Route = createFileRoute('/auth')({
 
     if (auth && auth.isAuthenticated) {
       throw redirect({
-        to: '/',
+        to: '/tasks',
       })
     }
   },
