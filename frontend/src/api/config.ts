@@ -77,3 +77,10 @@ axiosInstance.interceptors.response.use(
 )
 
 export default axiosInstance
+
+export type TResponse<T> = {
+  status: number
+  data: T
+  meta: null
+  msg: string
+}
