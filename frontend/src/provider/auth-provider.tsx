@@ -28,8 +28,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: getUserAPI,
   })
 
-  console.log(userData)
-
   // Derive user directly from query data
   const user =
     isFetched && userData?.data?.session?.user
