@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,17 @@ import { List, Plus, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from './ui/button'
 import { useAuth } from '@/provider/auth-provider'
+import { logoutAPI } from '@/api/auth'
 
 export default function Header() {
+  const router = useRouter()
   const auth = useAuth()
+  const logout = async () => {
+    await logoutAPI()
+    router.navigate({
+      to: '/auth',
+    })
+  }
 
   return (
     <header className="border-b-2">
@@ -36,12 +44,12 @@ export default function Header() {
           </Link>
 
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger className="cursor-pointer">
               <User />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>{auth.user?.email}</DropdownMenuLabel>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={logout}>
                 Log out
                 <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
               </DropdownMenuItem>

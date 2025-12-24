@@ -18,6 +18,7 @@ import {
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { loginAPI, verifyAPI } from '@/api/auth'
+import { useRouter } from '@tanstack/react-router'
 
 const formSchema = z.object({
   email: z.string().email('Add a valid email'),
@@ -119,6 +120,8 @@ const OTPForm = ({ email }: { email: string }) => {
     },
   })
 
+  const router = useRouter()
+
   const verifyMutation = useMutation({
     mutationFn: verifyAPI,
     mutationKey: ['verify otp'],
@@ -131,7 +134,11 @@ const OTPForm = ({ email }: { email: string }) => {
         otp: data.otp,
       },
       {
-        onSuccess: () => console.log('vayo'),
+        onSuccess: () => {
+          router.navigate({
+            to: '/tasks',
+          })
+        },
         onError: () => console.log('vayena'),
       },
     )
