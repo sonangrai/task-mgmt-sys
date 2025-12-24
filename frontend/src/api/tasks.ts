@@ -1,12 +1,22 @@
 import type { AxiosResponse } from 'axios'
 import axiosInstance, { type TResponse } from './config'
 
+export const TaskStatusEnum = [
+  'pending',
+  'in_progress',
+  'completed',
+  'cancelled',
+  'on_hold',
+]
+
 export type TTaskStatus =
   | 'pending'
   | 'in_progress'
   | 'completed'
   | 'cancelled'
   | 'on_hold'
+
+export const TaskPriorityEnum = ['urgent', 'high', 'medium', 'moderate', 'low']
 
 export type TTaskPriority = 'urgent' | 'high' | 'medium' | 'moderate' | 'low'
 
