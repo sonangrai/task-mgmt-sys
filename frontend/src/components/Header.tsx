@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouter } from '@tanstack/react-router'
+import { Link, useNavigate, useRouter, useSearch } from '@tanstack/react-router'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,8 +15,12 @@ import { logoutAPI } from '@/api/auth'
 
 export default function Header() {
   const router = useRouter()
+  const search = useSearch({ from: '/tasks' })
   const navigate = useNavigate()
   const auth = useAuth()
+
+  const activeAddTask = search.hasOwnProperty('add') && search.add == 'task'
+
   const logout = async () => {
     await logoutAPI()
     router.navigate({
@@ -45,7 +49,7 @@ export default function Header() {
           <Button
             className={cn(
               buttonVariants({
-                variant: 'secondary',
+                variant: activeAddTask ? 'default' : 'secondary',
               }),
               'cursor-pointer',
             )}
