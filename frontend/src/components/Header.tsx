@@ -27,9 +27,10 @@ export default function Header() {
   const queryAddModal = () => {
     navigate({
       to: '/tasks',
-      search: {
+      search: (prev) => ({
+        ...prev,
         add: 'task',
-      },
+      }),
     })
   }
 
