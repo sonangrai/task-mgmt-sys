@@ -4,7 +4,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { List, Plus, User } from 'lucide-react'
@@ -40,7 +39,7 @@ export default function Header() {
 
   return (
     <header className="border-b-2">
-      <div className="container flex justify-between items-center mx-auto py-4">
+      <div className="container flex justify-between items-center mx-auto px-2 py-4">
         <Link to="/" className="font-bold flex items-center">
           <List />
         </Link>
@@ -65,10 +64,7 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>{auth.user?.email}</DropdownMenuLabel>
-              <DropdownMenuItem onClick={logout}>
-                Log out
-                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

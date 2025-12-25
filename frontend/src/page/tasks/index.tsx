@@ -24,7 +24,7 @@ function TasksPage() {
   return (
     <>
       <div className="container mx-auto py-6">
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid lg:grid-cols-5 gap-4">
           {taskStatus.map((stat) => (
             <div key={stat} className="rounded-sm border px-4 py-2">
               <h2 className="capitalize font-medium bg-gray-100 py-1 px-2 rounded-sm">
