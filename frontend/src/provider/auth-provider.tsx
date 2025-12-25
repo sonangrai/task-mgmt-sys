@@ -1,4 +1,5 @@
 import { getUserAPI } from '@/api/auth'
+import { Toaster } from '@/components/ui/sonner'
 import { useQuery } from '@tanstack/react-query'
 import { createContext, useContext, type ReactNode } from 'react'
 
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={value}>
       {isPending ? <>Loading...</> : <>{children}</>}
+      <Toaster />
     </AuthContext.Provider>
   )
 }

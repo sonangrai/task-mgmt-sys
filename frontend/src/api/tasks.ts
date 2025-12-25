@@ -1,5 +1,7 @@
 import type { AxiosResponse } from 'axios'
 import axiosInstance, { type TResponse } from './config'
+import type { taskFormSchema } from '@/page/tasks/task-form'
+import * as z from 'zod'
 
 export const TaskStatusEnum = [
   'pending',
@@ -36,7 +38,16 @@ export type TTask = {
 
 type TaskResponse = TResponse<TTask[]>
 
+// Get tasks
 export const getTaskAPI = async (): Promise<AxiosResponse<TaskResponse>> => {
   const res = await axiosInstance.get('/task')
+  return res
+}
+
+// Create task
+export const createTaskAPI = async (
+  data: z.infer<typeof taskFormSchema>,
+): Promise<AxiosResponse<TaskResponse>> => {
+  const res = await axiosInstance.post('/task', JSON.stringify(data))
   return res
 }

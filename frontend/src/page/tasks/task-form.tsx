@@ -1,4 +1,4 @@
-import { TaskPriorityEnum, TaskStatusEnum } from '@/api/tasks'
+import { createTaskAPI, TaskPriorityEnum, TaskStatusEnum } from '@/api/tasks'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -25,31 +25,61 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronDownIcon } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { add } from 'date-fns'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-const formSchema = z.object({
-  title: z.string(),
-  description: z.string(),
+export const taskFormSchema = z.object({
+  title: z.string().min(1, { message: 'Title is required' }),
+  description: z.string().min(1, { message: 'Description is required' }),
   status: z.enum(TaskStatusEnum as [string, ...string[]]),
   priority: z.enum(TaskPriorityEnum as [string, ...string[]]),
-  due: z.string(),
-  completedOn: z.string(),
+  due: z.date(),
+  completedOn: z.date().nullable(),
 })
 
+const minDue = () => {
+  const today = new Date()
+  return add(today, { days: 7 })
+}
+
 function TaskForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const queryClient = useQueryClient()
+
+  const form = useForm<z.infer<typeof taskFormSchema>>({
+    resolver: zodResolver(taskFormSchema),
     defaultValues: {
       title: '',
       description: '',
       status: 'pending',
       priority: 'low',
-      due: '',
-      completedOn: '',
+      due: minDue(),
+      completedOn: null,
     },
   })
 
+  const createTaskMutation = useMutation({
+    mutationKey: ['create task'],
+    mutationFn: createTaskAPI,
+  })
+
+  const handleSubmit = async (data: z.infer<typeof taskFormSchema>) => {
+    try {
+      await createTaskMutation.mutateAsync(data)
+      await queryClient.invalidateQueries({
+        queryKey: ['tasks'],
+        refetchType: 'all',
+      })
+      toast.success('Created a task')
+
+      form.reset()
+    } catch (error) {
+      toast.error('not created')
+    }
+  }
+
   return (
-    <form className="flex gap-4">
+    <form className="flex gap-4" onSubmit={form.handleSubmit(handleSubmit)}>
       <div className="grow-2 space-y-4">
         <FieldGroup>
           <Controller
@@ -93,9 +123,13 @@ function TaskForm() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="otp">Status</FieldLabel>
-                <Select {...field}>
-                  <SelectTrigger>
+                <FieldLabel htmlFor="status">Status</FieldLabel>
+                <Select
+                  name={field.name}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="capitalize">
                     <SelectValue placeholder="status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -125,10 +159,14 @@ function TaskForm() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="otp">Priority</FieldLabel>
-                <Select {...field}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="status" />
+                <FieldLabel htmlFor="priority">Priority</FieldLabel>
+                <Select
+                  name={field.name}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="capitalize">
+                    <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
                     {TaskPriorityEnum.map((priority) => (
@@ -157,7 +195,7 @@ function TaskForm() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="otp">Due Date</FieldLabel>
+                <FieldLabel htmlFor="due">Due Date</FieldLabel>
 
                 <Popover>
                   <PopoverTrigger asChild>
@@ -201,7 +239,7 @@ function TaskForm() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="otp">Completed Date</FieldLabel>
+                <FieldLabel htmlFor="completedOn">Completed Date</FieldLabel>
 
                 <Popover>
                   <PopoverTrigger asChild>
@@ -222,7 +260,7 @@ function TaskForm() {
                   >
                     <Calendar
                       mode="single"
-                      selected={new Date(field.value)}
+                      selected={field.value ? new Date(field.value) : undefined}
                       captionLayout="dropdown"
                       onSelect={(date) => {
                         field.onChange(date)
@@ -239,7 +277,9 @@ function TaskForm() {
           />
         </FieldGroup>
 
-        <Button type="submit">Create</Button>
+        <Button type="submit" disabled={createTaskMutation.isPending}>
+          {createTaskMutation.isPending ? 'Creating...' : 'Create'}
+        </Button>
       </div>
     </form>
   )
