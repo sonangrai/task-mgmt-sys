@@ -51,7 +51,7 @@ const minDue = () => {
   return add(today, { days: 7 })
 }
 
-function TaskForm({ data }: { data: TTask | null }) {
+function TaskForm({ data }: { data?: TTask | null }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
