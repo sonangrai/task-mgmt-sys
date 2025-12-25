@@ -29,14 +29,14 @@ export type TTask = {
   description: string
   status: TTaskStatus
   priority: TTaskPriority
-  due: string
-  completedOn: string | null
-  updated_at: string | null
-  created_at: string
-  deleted_at: string | null
+  due: String
+  completedOn: String | null
+  updated_at: String | null
+  created_at: String
+  deleted_at: String | null
 }
 
-type TaskResponse = TResponse<TTask[]>
+export type TaskResponse = TResponse<TTask[]>
 
 // Get tasks
 export const getTaskAPI = async (): Promise<AxiosResponse<TaskResponse>> => {
@@ -49,5 +49,17 @@ export const createTaskAPI = async (
   data: z.infer<typeof taskFormSchema>,
 ): Promise<AxiosResponse<TaskResponse>> => {
   const res = await axiosInstance.post('/task', JSON.stringify(data))
+  return res
+}
+
+// Update task
+export const updateTaskAPI = async ({
+  id,
+  data,
+}: {
+  id: string
+  data: Partial<z.infer<typeof taskFormSchema>>
+}): Promise<AxiosResponse<TaskResponse>> => {
+  const res = await axiosInstance.put(`/task/${id}`, JSON.stringify(data))
   return res
 }
