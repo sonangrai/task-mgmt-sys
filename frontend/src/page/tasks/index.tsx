@@ -3,6 +3,7 @@ import Loader from '@/components/loader'
 import TaskCard from '@/components/task-card'
 import { useQuery } from '@tanstack/react-query'
 import CreateModal from './create-modal'
+import EditModal from './edit-modal'
 
 const taskStatus = [
   'pending',
@@ -40,6 +41,7 @@ function TasksPage() {
         </div>
       </div>
       <CreateModal />
+      <EditModal />
     </>
   )
 }

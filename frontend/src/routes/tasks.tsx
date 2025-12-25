@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const searchSchema = z.object({
   add: z.string().optional(),
+  task: z.string().optional(),
 })
 
 export const Route = createFileRoute('/tasks')({

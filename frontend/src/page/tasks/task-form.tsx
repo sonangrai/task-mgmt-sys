@@ -1,4 +1,10 @@
-import { createTaskAPI, TaskPriorityEnum, TaskStatusEnum } from '@/api/tasks'
+import {
+  createTaskAPI,
+  TaskPriorityEnum,
+  TaskStatusEnum,
+  updateTaskAPI,
+  type TTask,
+} from '@/api/tasks'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -28,6 +34,8 @@ import * as z from 'zod'
 import { add } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { ReactNode } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
 export const taskFormSchema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
@@ -43,18 +51,21 @@ const minDue = () => {
   return add(today, { days: 7 })
 }
 
-function TaskForm() {
+function TaskForm({ data }: { data: TTask | null }) {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof taskFormSchema>>({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      status: 'pending',
-      priority: 'low',
-      due: minDue(),
-      completedOn: null,
+      title: data?.title || '',
+      description: data?.description || '',
+      status: data?.status || 'pending',
+      priority: data?.priority || 'low',
+      due: data?.due ? new Date(data?.due.toString()) : minDue(),
+      completedOn: data?.completedOn
+        ? new Date(data?.completedOn?.toString())
+        : null,
     },
   })
 
@@ -63,21 +74,95 @@ function TaskForm() {
     mutationFn: createTaskAPI,
   })
 
+  const updateTaskMutation = useMutation({
+    mutationKey: ['update task'],
+    mutationFn: updateTaskAPI,
+  })
+
   const handleSubmit = async (data: z.infer<typeof taskFormSchema>) => {
     try {
       await createTaskMutation.mutateAsync(data)
       await queryClient.invalidateQueries({
         queryKey: ['tasks'],
-        refetchType: 'all',
       })
       toast.success('Created a task')
-
-      form.reset()
+      navigate({
+        to: '.',
+        search: (prev) => ({
+          ...prev,
+          add: undefined,
+        }),
+      })
     } catch (error) {
       toast.error('not created')
     }
   }
 
+  const handleSubmitUpdate = async (
+    payload: z.infer<typeof taskFormSchema>,
+  ) => {
+    try {
+      await updateTaskMutation.mutateAsync({
+        id: data?.id as string,
+        data: payload,
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['tasks'],
+      })
+      toast.success('Updated task')
+      navigate({
+        to: '.',
+        search: (prev) => ({
+          ...prev,
+          task: undefined,
+        }),
+      })
+    } catch (error) {
+      toast.error('not created')
+    }
+  }
+
+  if (data)
+    return (
+      <FormItems
+        form={form}
+        handleSubmit={handleSubmitUpdate}
+        actions={
+          <Button
+            type="submit"
+            variant={'secondary'}
+            disabled={createTaskMutation.isPending}
+          >
+            {updateTaskMutation.isPending ? 'Updating...' : 'Update'}
+          </Button>
+        }
+      />
+    )
+
+  return (
+    <FormItems
+      form={form}
+      handleSubmit={handleSubmit}
+      actions={
+        <Button type="submit" disabled={createTaskMutation.isPending}>
+          {createTaskMutation.isPending ? 'Creating...' : 'Create'}
+        </Button>
+      }
+    />
+  )
+}
+
+export default TaskForm
+
+const FormItems = ({
+  form,
+  actions,
+  handleSubmit,
+}: {
+  form: any
+  actions: ReactNode
+  handleSubmit: (d: any) => void
+}) => {
   return (
     <form className="flex gap-4" onSubmit={form.handleSubmit(handleSubmit)}>
       <div className="grow-2 space-y-4">
@@ -277,12 +362,8 @@ function TaskForm() {
           />
         </FieldGroup>
 
-        <Button type="submit" disabled={createTaskMutation.isPending}>
-          {createTaskMutation.isPending ? 'Creating...' : 'Create'}
-        </Button>
+        {actions}
       </div>
     </form>
   )
 }
-
-export default TaskForm
