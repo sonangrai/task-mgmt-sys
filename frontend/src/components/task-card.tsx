@@ -1,5 +1,6 @@
 import type { TTask, TTaskPriority } from '@/api/tasks'
 import { Badge } from './ui/badge'
+import { useNavigate } from '@tanstack/react-router'
 
 type TaskCardProp = {
   data: TTask
@@ -33,8 +34,22 @@ const getBadgeType = (pr: TTaskPriority): any => {
 }
 
 function TaskCard({ data }: TaskCardProp) {
+  const navigate = useNavigate()
+
+  const openTask = () => {
+    navigate({
+      to: '/tasks',
+      search: (prev) => ({
+        ...prev,
+        task: data.id,
+      }),
+    })
+  }
   return (
-    <div className="p-1 gap-1 border rounded-sm px-2 py-1">
+    <div
+      className="p-1 gap-1 border rounded-sm px-2 py-1 cursor-pointer"
+      onClick={openTask}
+    >
       <h3 className="font-medium text-sm">{data.title}</h3>
       <div className="overflow-hidden text-xs my-2 text-gray-500">
         <div
