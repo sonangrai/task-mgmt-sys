@@ -1,9 +1,9 @@
 import { getTaskAPI } from '@/api/tasks'
 import Loader from '@/components/loader'
-import TaskCard from '@/components/task-card'
 import { useQuery } from '@tanstack/react-query'
 import CreateModal from './create-modal'
 import EditModal from './edit-modal'
+import TaskList from './task-list'
 
 const taskStatus = [
   'pending',
@@ -30,12 +30,7 @@ function TasksPage() {
               <h2 className="capitalize font-medium bg-gray-100 py-1 px-2 rounded-sm">
                 {stat.replace('_', ' ')}
               </h2>
-              <div className="grid grid-cols-1 gap-2 py-2">
-                {taskData &&
-                  taskData.data.data
-                    .filter((a) => a?.status == stat)
-                    .map((task) => <TaskCard key={task.id} data={task} />)}
-              </div>
+              <TaskList stat={stat} taskData={taskData?.data.data} />
             </div>
           ))}
         </div>

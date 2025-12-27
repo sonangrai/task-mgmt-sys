@@ -47,8 +47,24 @@ function TaskCard({ data }: TaskCardProp) {
       }),
     })
   }
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.currentTarget.style.opacity = '0.5'
+    e.dataTransfer.setData('text/plain', JSON.stringify(data))
+  }
+
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.currentTarget.style.opacity = '1'
+  }
+
   return (
-    <div className="p-1 gap-1 border rounded-sm px-2 py-1 cursor-pointer">
+    <div
+      className="p-1 gap-1 border rounded-sm px-2 py-1 cursor-pointer"
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      id={data.id}
+    >
       <div className="flex gap-2">
         <button className="flex cursor-grab mt-0.5">
           <Grip className="w-4 h-4" />
