@@ -1,6 +1,8 @@
 import type { TTask, TTaskPriority } from '@/api/tasks'
 import { Badge } from './ui/badge'
 import { useNavigate } from '@tanstack/react-router'
+import { Button } from './ui/button'
+import { Eye, Grip } from 'lucide-react'
 
 type TaskCardProp = {
   data: TTask
@@ -46,11 +48,15 @@ function TaskCard({ data }: TaskCardProp) {
     })
   }
   return (
-    <div
-      className="p-1 gap-1 border rounded-sm px-2 py-1 cursor-pointer"
-      onClick={openTask}
-    >
-      <h3 className="font-medium text-sm">{data.title}</h3>
+    <div className="p-1 gap-1 border rounded-sm px-2 py-1 cursor-pointer">
+      <div className="flex gap-2">
+        <button className="flex cursor-grab mt-0.5">
+          <Grip className="w-4 h-4" />
+        </button>
+        <h3 className="font-medium text-sm" onClick={openTask}>
+          {data.title}
+        </h3>
+      </div>
       <div className="overflow-hidden text-xs my-2 text-gray-500">
         <div
           dangerouslySetInnerHTML={{ __html: data.description }}
