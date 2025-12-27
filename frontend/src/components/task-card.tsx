@@ -1,34 +1,34 @@
 import type { TTask, TTaskPriority } from '@/api/tasks'
 import { Badge } from './ui/badge'
 import { useNavigate } from '@tanstack/react-router'
-import { Button } from './ui/button'
-import { Eye, Grip } from 'lucide-react'
+import { Grip } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type TaskCardProp = {
   data: TTask
 }
 
 const getBadgeType = (pr: TTaskPriority): any => {
-  let tp = 'default'
+  let tp = 'bg-primary'
   switch (pr) {
     case 'urgent':
-      tp = 'destructive'
+      tp = 'bg-red-500'
       break
 
     case 'high':
-      tp = 'destructive'
+      tp = 'bg-pink-500'
       break
 
     case 'medium':
-      tp = 'secondary'
+      tp = 'bg-blue-500'
       break
 
     case 'moderate':
-      tp = 'outline'
+      tp = 'bg-yellow-500'
       break
 
     case 'low':
-      tp = 'outline'
+      tp = 'bg-cyan-500'
       break
   }
 
@@ -64,7 +64,7 @@ function TaskCard({ data }: TaskCardProp) {
         />
       </div>
       <div>
-        <Badge className="rounded-sm" variant={getBadgeType(data.priority)}>
+        <Badge className={cn(getBadgeType(data.priority), 'rounded-sm')}>
           {data.priority}
         </Badge>
       </div>
